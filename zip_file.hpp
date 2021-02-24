@@ -5029,11 +5029,11 @@ std::vector<std::string> split_path(const std::string &path, char delim = direct
     return split;
 }
     
-uint32_t crc32buf(const char *buf, std::size_t len)
+mz_uint32 crc32buf(const char *buf, std::size_t len)
 {
-    uint32_t oldcrc32 = 0xFFFFFFFF;
+    mz_uint32 oldcrc32 = 0xFFFFFFFF;
     
-    uint32_t crc_32_tab[] = { /* CRC polynomial 0xedb88320 */
+    mz_uint32 crc_32_tab[] = { /* CRC polynomial 0xedb88320 */
         0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
         0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
         0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
@@ -5080,7 +5080,7 @@ uint32_t crc32buf(const char *buf, std::size_t len)
     };
     
 #define UPDC32(octet,crc) (crc_32_tab[((crc)\
-^ static_cast<uint8_t>(octet)) & 0xff] ^ ((crc) >> 8))
+^ static_cast<mz_uint8>(octet)) & 0xff] ^ ((crc) >> 8))
     
     for ( ; len; --len, ++buf)
     {
@@ -5103,7 +5103,7 @@ tm safe_localtime(const time_t &t)
 #endif
 }
 
-std::size_t write_callback(void *opaque, std::uint64_t file_ofs, const void *pBuf, std::size_t n)
+std::size_t write_callback(void *opaque, mz_uint64 file_ofs, const void *pBuf, std::size_t n)
 {
     auto buffer = static_cast<std::vector<char> *>(opaque);
     
@@ -5139,15 +5139,15 @@ struct zip_info
 
     std::string comment;
     std::string extra;
-    uint16_t create_system = 0;
-    uint16_t create_version = 0;
-    uint16_t extract_version = 0;
-    uint16_t flag_bits = 0;
+    mz_uint16 create_system = 0;
+    mz_uint16 create_version = 0;
+    mz_uint16 extract_version = 0;
+    mz_uint16 flag_bits = 0;
     std::size_t volume = 0;
-    uint32_t internal_attr = 0;
-    uint32_t external_attr = 0;
+    mz_uint32 internal_attr = 0;
+    mz_uint32 external_attr = 0;
     std::size_t header_offset = 0;
-    uint32_t crc = 0;
+    mz_uint32 crc = 0;
     std::size_t compress_size = 0;
     std::size_t file_size = 0;
 };
@@ -5621,7 +5621,7 @@ private:
     {
         if(!comment.empty())
         {
-            auto comment_length = std::min(static_cast<uint16_t>(comment.length()), std::numeric_limits<uint16_t>::max());
+            auto comment_length = std::min(static_cast<mz_uint16>(comment.length()), std::numeric_limits<mz_uint16>::max());
             buffer_[buffer_.size() - 2] = static_cast<char>(comment_length);
             buffer_[buffer_.size() - 1] = static_cast<char>(comment_length >> 8);
             std::copy(comment.begin(), comment.end(), std::back_inserter(buffer_));
@@ -5651,8 +5651,8 @@ private:
             throw std::runtime_error("didn't find end of central directory signature");
         }
         
-        uint16_t length = static_cast<uint16_t>(buffer_[position + 1]);
-        length = static_cast<uint16_t>(length << 8) + static_cast<uint16_t>(buffer_[position]);
+        mz_uint16 length = static_cast<mz_uint16>(buffer_[position + 1]);
+        length = static_cast<mz_uint16>(length << 8) + static_cast<mz_uint16>(buffer_[position]);
         position += 2;
         
         if(length != 0)
